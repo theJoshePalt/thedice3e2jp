@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useAccelerometer } from '../../lib/modules/sensors/accelerometer/useAccelerometer';
-
+import DiceVisual from '../../components/atoms/DiceVisual';
 // Obtenemos el ancho de la pantalla para que el dado se vea bien en cualquier cel
 const { width } = Dimensions.get('window');
 
@@ -24,9 +24,8 @@ export default function DiceGame() {
 
         {/* 2. EL DADO (Cuerpo principal) */}
         <View style={styles.diceBody}>
-          <View style={styles.diceFace}>
-            <Text style={styles.diceNumber}>{diceValue}</Text>
-          </View>
+          {/* Reemplazamos la cara plana por el componente 3D */}
+          <DiceVisual />
         </View>
 
         {/* 3. INSTRUCCIONES */}
