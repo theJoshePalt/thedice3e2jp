@@ -1,38 +1,41 @@
-import React, { useRef } from 'react'; // 1. Importamos useRef
-import { Canvas, useFrame } from '@react-three/fiber/native'; // 2. Importamos useFrame
+import React, { useRef } from 'react';
+import { useRef as useReactRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber/native';
 
-function BoxMesh() {
-  // 3. Creamos una referencia para el Mesh
+function CasinoDice() {
   const meshRef = useRef<any>(null);
 
-  // 4. Esta función corre 60 veces por segundo
-  useFrame((state, delta) => {
+  useFrame(() => {
     if (meshRef.current) {
-      // Rotamos un poquito en cada frame
-      // += significa "lo que ya tenía más un poquito"
-      meshRef.current.rotation.x += 0.01; // Gira hacia adelante
-      meshRef.current.rotation.y += 0.01; // Gira hacia los lados
+      meshRef.current.rotation.x += 0.01;
+      meshRef.current.rotation.y += 0.01;
     }
   });
 
   return (
-    <mesh 
-      ref={meshRef} // 5. Conectamos la referencia al objeto
-      position={[0, 0, 0]} 
-      scale={[2, 2, 2]} 
-    >
+    <mesh ref={meshRef} scale={[2.2, 2.2, 2.2]}>
+      {/* Esqueleto del dado */}
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="gray" />
+      
+      {/* La "Piel" del dado: Rojo Poker con brillo de Casino */}
+      <meshStandardMaterial 
+        color="#C41E3A" 
+        roughness={0.2} // Un poco de brillo
+        metalness={0.3} // Reflejo premium
+      />
     </mesh>
   );
 }
 
 export default function DiceVisual() {
   return (
-    <Canvas style={{ width: '100%', height: '100%' }}>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <BoxMesh />
+    <Canvas>
+      {/* Mejoramos la iluminación para que el rojo resalte */}
+      <ambientLight intensity={0.7} /> 
+      <pointLight position={[5, 5, 5]} intensity={1} />
+      <spotLight position={[-5, 5, 5]} angle={0.15} penumbra={1} />
+      
+      <CasinoDice />
     </Canvas>
   );
 }
