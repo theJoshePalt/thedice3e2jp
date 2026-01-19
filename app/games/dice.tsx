@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   diceBody: {
     width: width * 0.35,          // 8. TAMAÑO DEL DADO (45% del ancho de pantalla)
     height: width * 0.35,
-    backgroundColor: '#0F0F0F',   // Borde dorado del dado
+
     padding: 12,
     elevation: 15,
   },
