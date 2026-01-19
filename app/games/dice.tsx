@@ -1,34 +1,41 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
+// Importamos el hook que ya creaste siguiendo tu guía (Paso 4)
 import { useAccelerometer } from '../../lib/modules/sensors/accelerometer/useAccelerometer';
 import DiceVisual from '../../components/atoms/DiceVisual';
-// Obtenemos el ancho de la pantalla para que el dado se vea bien en cualquier cel
+
 const { width } = Dimensions.get('window');
 
 export default function DiceGame() {
+  // 1. Estado para guardar el número del dado
   const [diceValue, setDiceValue] = useState(1);
 
-  const rollDice = () => {
+  // 2. Función que se dispara al detectar el "Shake"
+  const handleShake = () => {
     const newValue = Math.floor(Math.random() * 6) + 1;
     setDiceValue(newValue);
+    console.log("¡Dado lanzado! Resultado:", newValue);
   };
 
-  // Implementación del Hook Adaptador (Paso 4 de tu guía)
-  useAccelerometer(rollDice);
+  // 3. Conectamos el acelerómetro. 
+  // El hook usará la lógica de 'isShaking' de tu motion.ts automáticamente.
+  useAccelerometer(handleShake);
 
   return (
     <View style={styles.container}>
-      {/* 1. EL TAPETE (Mesa de juego) */}
       <View style={styles.table}>
         <Text style={styles.casinoBrand}>★ ROYAL CASINO ★</Text>
 
-        {/* 2. EL DADO (Cuerpo principal) */}
+        {/* Muestra el número actual arriba mientras no hay animación */}
+        <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold' }}>
+          RESULTADO: {diceValue}
+        </Text>
+
         <View style={styles.diceBody}>
-          {/* Reemplazamos la cara plana por el componente 3D */}
-          <DiceVisual />
+          {/* Pasamos el valor actual al componente 3D (para el Paso 3) */}
+          <DiceVisual value={diceValue} />
         </View>
 
-        {/* 3. INSTRUCCIONES */}
         <View style={styles.footer}>
           <Text style={styles.instructionText}>SACUDE PARA TIRAR</Text>
           <View style={styles.goldLine} />
@@ -37,6 +44,8 @@ export default function DiceGame() {
     </View>
   );
 }
+
+// ... tus estilos se mantienen iguales
 
 const styles = StyleSheet.create({
   container: {
