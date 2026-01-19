@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber/native';
+import { MathUtils } from 'three';
 
-// Este componente dibuja un punto blanco en una posición específica
 function Dot({ position }: { position: [number, number, number] }) {
   return (
     <mesh position={position}>
@@ -10,15 +10,33 @@ function Dot({ position }: { position: [number, number, number] }) {
     </mesh>
   );
 }
+// Definimos las rotaciones exactas para que cada cara mire a la cámara
+const targetRotations: Record<number, [number, number, number]> = {
+  1: [Math.PI / 2, 0, 0],          // Cara 1 (Y+)
+  6: [-Math.PI / 2, 0, 0],         // Cara 6 (Y-)
+  5: [0, 0, 0],                    // Cara 5 (Z+)
+  2: [0, Math.PI, 0],              // Cara 2 (Z-)
+  4: [0, -Math.PI / 2, 0],         // Cara 4 (X+)
+  3: [0, Math.PI / 2, 0],          // Cara 3 (X-)
+};
 
-function CasinoDice() {
+
+function CasinoDice({ value, shaking }: { value: number, shaking: boolean }) {
   const meshRef = useRef<any>(null);
 
-  // Mantenemos la rotación para que se vean todas las caras por ahora
-  useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x += 0.01;
-      meshRef.current.rotation.y += 0.01;
+  useFrame((state, delta) => {
+    if (!meshRef.current) return;
+
+    if (shaking) {
+      // Si está agitando, rotación loca y rápida
+      meshRef.current.rotation.x += delta * 15;
+      meshRef.current.rotation.y += delta * 15;
+    } else {
+      // Si paró, usamos lerp para ir suavemente a la rotación del número final
+      const target = targetRotations[value] || [0, 0, 0];
+      meshRef.current.rotation.x = MathUtils.lerp(meshRef.current.rotation.x, target[0], 0.1);
+      meshRef.current.rotation.y = MathUtils.lerp(meshRef.current.rotation.y, target[1], 0.1);
+      meshRef.current.rotation.z = MathUtils.lerp(meshRef.current.rotation.z, target[2], 0.1);
     }
   });
 
@@ -67,19 +85,13 @@ function CasinoDice() {
   );
 }
 
-export default function DiceVisual() {
+export default function DiceVisual({ value, isShaking }: { value: number, isShaking: boolean }) {
   return (
     <Canvas>
-      {/* 1. Luz de ambiente para que no haya sombras negras puras */}
       <ambientLight intensity={1.5} /> 
-      
-      {/* 2. Luz principal (Como un foco de estudio) */}
-      <pointLight position={[10, 10, 10]} intensity={2.5} color="#ffffff" />
-      
-      {/* 3. Luz de contra (Para resaltar los bordes dorados/rojos) */}
+      <pointLight position={[10, 10, 10]} intensity={2.5} />
       <pointLight position={[-10, -10, -10]} intensity={1.5} color="#D4AF37" />
-
-      <CasinoDice />
+      <CasinoDice value={value} shaking={isShaking} />
     </Canvas>
   );
 }
